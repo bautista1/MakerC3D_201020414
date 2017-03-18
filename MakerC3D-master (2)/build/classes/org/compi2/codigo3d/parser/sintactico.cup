@@ -51,7 +51,7 @@ start with inicial;
 inicial     ::= {: ControlC3D.reiniciar(); :} expresion:exp 
                     {: 
                         RESULT = exp;
-                        ControlC3D.agregarC3D("//Último valor: " + exp.getCad());
+                      //  ControlC3D.agregarC3D("//Último valor: " + exp.getCad());
                     :};
 
 expresion   ::= expresion:izq MAS expresion:der
@@ -92,17 +92,87 @@ expresion   ::= expresion:izq MAS expresion:der
            
             |   expresion:izq orLogico  expresion:der 
                      {: 
-                        String temp = ControlC3D.generaTemp();
-                        String c3d = temp + " = " + izq.getCad() + " || " + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                         
+                       //(b<=c)&&(a==x)
+                        String etV="";
+                        String etF="";
+                        String cadGen="";
+                        if(ControlC3D.getPre()<=1){
+                            etV=ControlC3D.genEtiqueta();
+                            etF=ControlC3D.genEtiqueta();
+                            ControlC3D.almacenarEv(etV);
+                            cadGen="\n if "+izq.getCad()+" goto "+etV+";\n";
+                            cadGen+="goto "+etF+";\n";
+                            cadGen+=etF+":\n";
+
+                               etV=ControlC3D.genEtiqueta();
+                               etF=ControlC3D.genEtiqueta();
+                               ControlC3D.almacenarEv(etV);
+                               
+                               cadGen+="\n if "+der.getCad()+" goto "+etV+";\n";
+                               cadGen+="goto "+etF+";\n";
+                               cadGen+=etF+":\n";
+                               
+                              
+                               cadGen+=ControlC3D.getEv()+":\n";
+                        }else{
+                               etV=ControlC3D.genEtiqueta();
+                               etF=ControlC3D.genEtiqueta();
+                               ControlC3D.almacenarEv(etV);
+                               
+                               cadGen+="\n if "+der.getCad()+" goto "+etV+";\n";
+                               cadGen+="goto "+etF+";\n";
+                               cadGen+=etF+":\n";
+                               
+                               cadGen+=ControlC3D.getEv()+":\n";
+                        }
+                         
+                              ControlC3D.setPre(2); 
+                              ControlC3D.agregarC3D(cadGen);
+                              ControlC3D.formatearEf();
+                        RESULT = new NodoC3D(ControlC3D.getEv());
                     :}
             |   expresion:izq andLogico expresion:der
                     {: 
-                        String temp = ControlC3D.generaTemp();
-                        String c3d = temp + " = " + izq.getCad() + " && " + der.getCad() + ";\n";
-                        ControlC3D.agregarC3D(c3d);
-                        RESULT = new NodoC3D(temp); 
+                                               
+                       //(b<=c)&&(a==x)
+                        String etV="";
+                        String etF="";
+                        String cadGen="";
+                        if(ControlC3D.getPre()<=2){
+                            etV=ControlC3D.genEtiqueta();
+                            etF=ControlC3D.genEtiqueta();
+                            ControlC3D.almacenarEf(etF);
+                            cadGen="\n if "+izq.getCad()+" goto "+etV+";\n";
+                            cadGen+="goto "+etF+";\n";
+                            cadGen+=etV+":\n";
+
+                            etV=ControlC3D.genEtiqueta();
+                               etF=ControlC3D.genEtiqueta();
+                               ControlC3D.almacenarEf(etF);
+                               
+                               cadGen+="\n if "+der.getCad()+" goto "+etV+";\n";
+                               cadGen+="goto "+etF+";\n";
+                               cadGen+=etV+":\n";
+                               
+                              
+                               cadGen+=ControlC3D.getEf()+":\n";
+                        }else{
+                               etV=ControlC3D.genEtiqueta();
+                               etF=ControlC3D.genEtiqueta();
+                               ControlC3D.almacenarEf(etF);
+                               
+                               cadGen+="\n if "+der.getCad()+" goto "+etV+";\n";
+                               cadGen+="goto "+etF+";\n";
+                               cadGen+=etV+":\n";
+                               
+                               cadGen+=ControlC3D.getEf()+":\n";
+                        }
+                         
+                              ControlC3D.setPre(3); 
+                              ControlC3D.agregarC3D(cadGen);
+                              ControlC3D.formatearEv();
+                        RESULT = new NodoC3D(ControlC3D.getEf());
                     :}
             |   expresion:izq RELACIONAL:r expresion:der
                     {: 
